@@ -101,6 +101,24 @@ RUN tar -xzf /minpath1.4.tar.gz && \
 #metaerg
 RUN git clone https://github.com/xiaoli-dong/metaerg.git
 ENV MinPath /NGStools/MinPath
+
+# tmhmm and signalp
+COPY signalp-4.1g.Linux.tar.gz /
+RUN cd /NGStools && \
+    tar -zxvf /signalp-4.1g.Linux.tar.gz && \
+    sed -i 's,/usr/cbs/bio/src/signalp-4.1,/home/linuxbrew/signalp-4.1,g' signalp-4.1/signalp && \
+	sed -i 's,/usr/opt/www/pub/CBS/services/SignalP-4.1,/NGStools,g' signalp-4.1/signalp && \
+    cd /NGStools && \
+    cpanm Bio::DB::Fasta
+
+COPY tmhmm-2.0c.Linux.tar.gz /
+RUN cd /NGStools && \
+    tar -zxvf /tmhmm-2.0c.Linux.tar.gz && \
+    sed -i 's,#!/usr/local/bin/perl,#!/usr/bin/perl,g' tmhmm-2.0c/bin/tmhmm && \
+    sed -i 's,#!/usr/local/bin/perl,#!/usr/bin/perl,g' tmhmm-2.0c/bin/tmhmmformat.pl && \
+    cd /NGStools
+
+
 # Clean
 RUN apt-get remove -y autoconf \
     cpanminus \
@@ -109,6 +127,7 @@ RUN apt-get remove -y autoconf \
     make && \
     apt-get autoclean -y
 
-ENV PATH="/NGStools/aragorn:/NGStools/minced:/NGStools/Prodigal:/NGStools/ncbi-blast-2.9.0+/bin:/NGStools/diamond:/NGStools/hmmer/src:/NGStools/MinPath:/NGStools/metaerg/bin:${PATH}"
+
+ENV PATH="/NGStools/tmhmm-2.0c/bin:/NGStools/signalp-4.1:/NGStools/aragorn:/NGStools/minced:/NGStools/Prodigal:/NGStools/ncbi-blast-2.9.0+/bin:/NGStools/diamond:/NGStools/hmmer/src:/NGStools/MinPath:/NGStools/metaerg/bin:${PATH}"
 
 WORKDIR /NGStools/
